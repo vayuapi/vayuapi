@@ -1,0 +1,206 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+[tool.setuptools.packages.find]
+include = ["vayuapi*"]
+
+[project]
+name = "vayuapi"
+version = "0.1.1"
+description = "The fastest Python async API framework for rapid development with AI/ML support"
+readme = "README.md"
+requires-python = ">=3.11,<3.17"
+license = {text = "MIT"}
+keywords = [
+    "api", "async", "asyncio", "framework", "fastapi", "starlette",
+    "django", "orm", "rest", "restful", "websocket", "microservices",
+    "ai", "ml", "langchain", "rag", "pydantic", "admin", "security"
+]
+authors = [
+    {name = "VayuAPI Team", email = "alokk.gzp@gmail.com"}
+]
+maintainers = [
+    {name = "VayuAPI Team", email = "alokk.gzp@gmail.com"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Operating System :: POSIX",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: Unix",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Framework :: AsyncIO",
+    "Topic :: Internet",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "starlette>=0.35.0,<1.0.0",
+    "uvicorn[standard]>=0.27.0,<1.0.0",
+    "pydantic>=2.5.0,<3.0.0",
+    "uvloop>=0.19.0; sys_platform != 'win32'",
+    "python-multipart>=0.0.6",
+    "jinja2>=3.1.2",
+    "httpx>=0.26.0",
+]
+
+[project.optional-dependencies]
+# Django ORM support
+django = [
+    "django>=4.2.0,<6.0.0",
+    "psycopg2-binary>=2.9.0",
+]
+
+# Async ORM support
+orm = [
+    "tortoise-orm>=0.20.0",
+    "asyncpg>=0.29.0",
+    "aiomysql>=0.2.0",
+]
+
+# SQLAlchemy async
+sqlalchemy = [
+    "sqlalchemy[asyncio]>=2.0.0",
+    "asyncpg>=0.29.0",
+]
+
+# NoSQL databases
+nosql = [
+    "motor>=3.3.0",  # MongoDB
+    "redis>=5.0.0",
+    "aioredis>=2.0.1",
+]
+
+# Vector databases
+vector = [
+    "chromadb>=0.4.0",
+    "pinecone-client>=2.2.0",
+    "weaviate-client>=3.25.0",
+    "qdrant-client>=1.7.0",
+]
+
+# AI/ML integrations
+ai = [
+    "langchain>=0.1.0",
+    "langchain-openai>=0.0.5",
+    "langchain-anthropic>=0.1.0",
+    "langchain-community>=0.0.20",
+    "pydantic-ai>=0.0.5",
+    "openai>=1.10.0",
+    "anthropic>=0.18.0",
+]
+
+# RAG and embeddings
+rag = [
+    "langchain>=0.1.0",
+    "langchain-chroma>=0.1.0",
+    "langchain-pinecone>=0.1.0",
+    "sentence-transformers>=2.3.0",
+    "tiktoken>=0.6.0",
+]
+
+# Task scheduling
+scheduler = [
+    "apscheduler>=3.10.0",
+    "celery>=5.3.0",
+    "redis>=5.0.0",
+]
+
+# Security
+security = [
+    "cryptography>=41.0.0",
+    "pyjwt>=2.8.0",
+    "passlib>=1.7.4",
+    "bcrypt>=4.1.0",
+]
+
+# HTTP client
+http = [
+    "httpx>=0.26.0",
+    "aiohttp>=3.9.0",
+]
+
+# Testing
+test = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "httpx>=0.26.0",
+]
+
+# All dependencies
+all = [
+    "vayuapi[django,orm,sqlalchemy,nosql,vector,ai,rag,scheduler,security,http]",
+]
+
+# Development dependencies (testing + linting only)
+dev = [
+    "vayuapi[test]",
+    "black>=24.0.0",
+    "ruff>=0.2.0",
+    "mypy>=1.8.0",
+    "pre-commit>=3.6.0",
+]
+
+# Development with all features
+dev-all = [
+    "vayuapi[all,test]",
+    "black>=24.0.0",
+    "ruff>=0.2.0",
+    "mypy>=1.8.0",
+    "pre-commit>=3.6.0",
+]
+
+[project.urls]
+Homepage = "https://vayuapi.dev"
+Documentation = "https://vayuapi.dev/docs"
+Repository = "https://github.com/vayuapi/vayuapi"
+"Bug Tracker" = "https://github.com/vayuapi/vayuapi/issues"
+Changelog = "https://github.com/vayuapi/vayuapi/blob/main/CHANGELOG.md"
+
+[project.scripts]
+vayuapi = "vayuapi.cli:main"
+
+#[tool.setuptools]
+#packages = ["vayuapi"]
+
+[tool.setuptools.package-data]
+vayuapi = ["py.typed", "admin/templates/*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
