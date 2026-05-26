@@ -1,0 +1,44 @@
+# Include documentation
+include README.md
+include LICENSE
+include CHANGELOG.md
+include CONTRIBUTING.md
+include SECURITY.md
+include CODE_OF_CONDUCT.md
+
+# Include configuration files
+include pyproject.toml
+include setup.py
+include requirements.txt
+
+# Include package data
+recursive-include vayuapi *.py
+recursive-include vayuapi *.typed
+recursive-include vayuapi/admin/templates *.html
+recursive-include vayuapi/admin/templates *.css
+recursive-include vayuapi/admin/templates *.js
+
+# Include tests
+recursive-include tests *.py
+
+# Include examples
+recursive-include examples *.py
+recursive-include examples *.md
+
+# Exclude unwanted files
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *~
+global-exclude __pycache__
+global-exclude .DS_Store
+global-exclude *.so
+global-exclude *.dylib
+
+# Exclude build artifacts
+prune build
+prune dist
+prune *.egg-info
+prune .git
+prune .github
+prune .vscode
+prune .idea
