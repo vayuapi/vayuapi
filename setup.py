@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="vayuapi",
-    version="0.1.1",
+    version="0.1.2",
     author="VayuAPI Team",
     author_email="alokk.gzp@gmail.com",
     description="The fastest Python async API framework for rapid development with AI/ML support",
@@ -15,7 +15,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/vayuapi/vayuapi",
     project_urls={
-        "Documentation": "https://vayuapi.dev/docs",
+        "Documentation": "https://vayuapi.amrits.in/",
         "Source Code": "https://github.com/vayuapi/vayuapi",
         "Bug Tracker": "https://github.com/vayuapi/vayuapi/issues",
         "Changelog": "https://github.com/vayuapi/vayuapi/blob/main/CHANGELOG.md",
@@ -39,7 +39,9 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Framework :: AsyncIO",
+        "Framework :: Pydantic :: 2",
         "Topic :: Internet",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
@@ -49,7 +51,7 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Typing :: Typed",
     ],
-    python_requires=">=3.11,<3.17",
+    python_requires=">=3.11,<3.16",
     install_requires=[
         "starlette>=0.35.0,<1.0.0",
         "uvicorn[standard]>=0.27.0,<1.0.0",
@@ -58,6 +60,9 @@ setup(
         "python-multipart>=0.0.6",
         "jinja2>=3.1.2",
         "httpx>=0.26.0",
+        "itsdangerous",
+        "pydantic",
+        "pydantic[email]"
     ],
     include_package_data=True,
     package_data={
