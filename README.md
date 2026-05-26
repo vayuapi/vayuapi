@@ -180,8 +180,6 @@ async def expensive_query(id: int):
 - ⚡ **Zero event loop blocking** (all I/O is async)
 - 🔒 **Stable under load** (semaphores prevent resource exhaustion)
 
-See [examples/concurrency_example.py](examples/concurrency_example.py) for complete examples.
-
 ## API Documentation
 
 VayuAPI automatically generates interactive API documentation for all your endpoints.
@@ -336,8 +334,6 @@ async def v1_users():
 
 app.mount("/api/v1", api_v1)
 ```
-
-See [TEMPLATING_GUIDE.md](TEMPLATING_GUIDE.md) for complete documentation.
 
 ## AI/ML Integration
 
@@ -571,8 +567,6 @@ app = VayuAPI(
 # gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker
 ```
 
-**See [PERFORMANCE.md](PERFORMANCE.md) for detailed optimization guide.**
-
 ## Architecture
 
 VayuAPI is built on:
@@ -588,14 +582,6 @@ VayuAPI is built on:
 - asyncio support
 - ASGI server (uvicorn, hypercorn)
 
-## Contributing
-
-VayuAPI is open source and welcomes contributions!
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
 
 ## License
 
@@ -603,25 +589,7 @@ MIT License - see LICENSE file for details
 
 ## Documentation
 
-Full documentation available at: https://vayuapi.dev/docs
-
-### Guides & References
-
-- **[Getting Started](GETTING_STARTED.md)** - Quick start guide and tutorials
-- **[API Reference](API_REFERENCE.md)** - Complete API documentation
-- **[Concurrency Guide](CONCURRENCY.md)** - 🚀 **NEW!** Native concurrency & low overhead features
-- **[Installation Guide](INSTALL.md)** - Platform-specific installation instructions
-- **[Deployment Guide](DEPLOYMENT.md)** - Production deployment patterns
-- **[Performance Guide](PERFORMANCE.md)** - Optimization and load testing
-- **[Examples](examples/)** - Working code examples
-- **[Contributing](CONTRIBUTING.md)** - Contribution guidelines
-
-### Performance & Load Testing
-
-Need to optimize your API for high traffic? Check out:
-- **[PERFORMANCE.md](PERFORMANCE.md)** - Complete performance optimization guide
-- **[Load Testing Example](examples/load_testing_guide.py)** - Locust load testing setup
-- **[Locust Configuration](locustfile.py)** - Ready-to-use load test config
+Full documentation available at: https://vayuapi.amrits.in/
 
 **Expected Performance (with optimizations):**
 - Median Response: <50ms

@@ -6,10 +6,10 @@ include = ["vayuapi*"]
 
 [project]
 name = "vayuapi"
-version = "0.1.1"
+version = "0.1.2"
 description = "The fastest Python async API framework for rapid development with AI/ML support"
 readme = "README.md"
-requires-python = ">=3.11,<3.17"
+requires-python = ">=3.11,<3.16"
 license = {text = "MIT"}
 keywords = [
     "api", "async", "asyncio", "framework", "fastapi", "starlette",
@@ -17,10 +17,10 @@ keywords = [
     "ai", "ml", "langchain", "rag", "pydantic", "admin", "security"
 ]
 authors = [
-    {name = "VayuAPI Team", email = "alokk.gzp@gmail.com"}
+    {name = "VayuAPI Team", email = "team@vayuapi.dev"}
 ]
 maintainers = [
-    {name = "VayuAPI Team", email = "alokk.gzp@gmail.com"}
+    {name = "VayuAPI Team", email = "team@vayuapi.dev"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -40,7 +40,8 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Framework :: AsyncIO",
+    "Programming Language :: Python :: 3.14",
+    "Framework :: VayuAPI, AsyncIO, Streamlit, Pydantic::2",
     "Topic :: Internet",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
@@ -59,6 +60,9 @@ dependencies = [
     "python-multipart>=0.0.6",
     "jinja2>=3.1.2",
     "httpx>=0.26.0",
+    "itsdangerous",
+    "pydantic[email]"
+
 ]
 
 [project.optional-dependencies]
@@ -169,8 +173,8 @@ dev-all = [
 ]
 
 [project.urls]
-Homepage = "https://vayuapi.dev"
-Documentation = "https://vayuapi.dev/docs"
+Homepage = "https://vayuapi.amrits.in"
+Documentation = "https://vayuapi.amrits.in/pages/documentation.html"
 Repository = "https://github.com/vayuapi/vayuapi"
 "Bug Tracker" = "https://github.com/vayuapi/vayuapi/issues"
 Changelog = "https://github.com/vayuapi/vayuapi/blob/main/CHANGELOG.md"
