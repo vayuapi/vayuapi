@@ -26,8 +26,20 @@ from vayuapi.core.params import (
     File,
 )
 
-# Dependency injection
+# Dependency injection (basic Depends/Security)
 from vayuapi.core.dependencies import Depends, Security
+
+# IoC / DI Container
+from vayuapi.di import (
+    DIContainer,
+    ServiceLifetime,
+    ServiceDescriptor,
+    ServiceScope,
+    ServiceProvider,
+    injectable,
+    inject,
+)
+from vayuapi.di.injectable import register_injectables
 
 # File uploads
 from vayuapi.core.uploads import UploadFile
@@ -107,9 +119,18 @@ __all__ = [
     "Body",
     "Form",
     "File",
-    # Dependencies
+    # Dependency injection (basic)
     "Depends",
     "Security",
+    # IoC DI Container
+    "DIContainer",
+    "ServiceLifetime",
+    "ServiceDescriptor",
+    "ServiceScope",
+    "ServiceProvider",
+    "injectable",
+    "inject",
+    "register_injectables",
     # File uploads
     "UploadFile",
     # Concurrency & Low Overhead
