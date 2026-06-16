@@ -7,9 +7,9 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="vayuapi",
-    version="0.1.2",
+    version="0.1.4",
     author="VayuAPI Team",
-    author_email="alokk.gzp@gmail.com",
+    author_email="codeswithalok@gmail.com",
     description="The fastest Python async API framework for rapid development with AI/ML support",
     long_description=long_description,
     long_description_content_type="text/markdown",
