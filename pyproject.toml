@@ -6,7 +6,7 @@ include = ["vayuapi*"]
 
 [project]
 name = "vayuapi"
-version = "0.1.2"
+version = "0.1.4"
 description = "The fastest Python async API framework for rapid development with AI/ML support"
 readme = "README.md"
 requires-python = ">=3.11,<3.16"
@@ -17,10 +17,10 @@ keywords = [
     "ai", "ml", "langchain", "rag", "pydantic", "admin", "security"
 ]
 authors = [
-    {name = "VayuAPI Team", email = "team@vayuapi.dev"}
+    {name = "VayuAPI Team", email = "codeswithalok@gmail.com"}
 ]
 maintainers = [
-    {name = "VayuAPI Team", email = "team@vayuapi.dev"}
+    {name = "VayuAPI Team", email = "codeswithalok@gmail.com"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -124,8 +124,27 @@ rag = [
 # Task scheduling
 scheduler = [
     "apscheduler>=3.10.0",
+]
+
+# Celery distributed task queue
+celery = [
     "celery>=5.3.0",
     "redis>=5.0.0",
+    "kombu>=5.3.0",
+]
+
+# ARQ async task queue
+arq = [
+    "arq>=0.25.0",
+    "redis>=5.0.0",
+]
+
+# gRPC support
+grpc = [
+    "grpcio>=1.60.0",
+    "grpcio-tools>=1.60.0",
+    "grpcio-reflection>=1.60.0",
+    "protobuf>=4.25.0",
 ]
 
 # Security
@@ -152,7 +171,7 @@ test = [
 
 # All dependencies
 all = [
-    "vayuapi[django,orm,sqlalchemy,nosql,vector,ai,rag,scheduler,security,http]",
+    "vayuapi[django,orm,sqlalchemy,nosql,vector,ai,rag,scheduler,celery,arq,grpc,security,http]",
 ]
 
 # Development dependencies (testing + linting only)
