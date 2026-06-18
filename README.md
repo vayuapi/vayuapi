@@ -2,12 +2,12 @@
 
 **The fastest Python async API framework for rapid development**
 ![VayuAPI](http://vayuapi.amrits.in/ingue/171.webp)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
-[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
-[![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
-[![Python 3.14](https://img.shields.io/badge/python-3.14-blue.svg)](https://www.python.org/downloads/)
-
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Downloads](https://img.shields.io/pypi/dm/vayuapi)](https://pypi.org/project/vayuapi/)
+[![Issues](https://img.shields.io/github/issues/vayuapi/vayuapi)](https://github.com/vayuapi/vayuapi/issues)
+[![Stars](https://img.shields.io/github/stars/vayuapi/vayuapi)](https://github.com/vayuapi/vayuapi/stargazers)
+[![PyPI version](https://img.shields.io/pypi/v/vayuapi.svg)](https://pypi.org/project/vayuapi/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/vayuapi.svg)](https://pypi.org/project/vayuapi/)
 
 ## Overview
 
@@ -578,7 +578,7 @@ VayuAPI is built on:
 
 ## Requirements
 
-- Python 3.12+
+- Python 3.11+
 - asyncio support
 - ASGI server (uvicorn, hypercorn)
 
@@ -611,4 +611,4 @@ For issues and questions:
 
 ---
 
-**Built with ❤️ for the Python community**
+**Built with ❤️ in India for the Python community**
