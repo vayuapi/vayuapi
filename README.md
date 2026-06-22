@@ -1,11 +1,11 @@
 # VayuAPI Framework 🔥
 
 **The fastest Python async API framework for rapid development**
-![VayuAPI](http://vayuapi.amrits.in/ingue/171.webp)
+![VayuAPI](https://vayuapi.amrits.in/static/assets/logo/171.webp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Downloads](https://img.shields.io/pypi/dm/vayuapi)](https://pypi.org/project/vayuapi/)
 [![Issues](https://img.shields.io/github/issues/vayuapi/vayuapi)](https://github.com/vayuapi/vayuapi/issues)
 [![Stars](https://img.shields.io/github/stars/vayuapi/vayuapi)](https://github.com/vayuapi/vayuapi/stargazers)
+[![Downloads](https://img.shields.io/pypi/dm/vayuapi)](https://pypi.org/project/vayuapi/)
 [![PyPI version](https://img.shields.io/pypi/v/vayuapi.svg)](https://pypi.org/project/vayuapi/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/vayuapi.svg)](https://pypi.org/project/vayuapi/)
 

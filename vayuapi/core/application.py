@@ -462,7 +462,7 @@ class VayuAPI:
     ):
         """Internal method to add route."""
         # Wrap endpoint with Pydantic validation if needed
-        wrapped_endpoint = self._wrap_endpoint(endpoint)
+        wrapped_endpoint = self._wrap_endpoint(endpoint, path=path)
 
         self._routes.append({
             "type": "route",
@@ -481,17 +481,21 @@ class VayuAPI:
             "endpoint": endpoint,
         })
 
-    def _wrap_endpoint(self, endpoint: Callable) -> Callable:
+    def _wrap_endpoint(self, endpoint: Callable, path: str = "") -> Callable:
         """
         Wrap endpoint with parameter extraction, validation, and dependency injection.
         Supports Path, Query, Header, Cookie, Body, Form, File, and Depends.
         OPTIMIZED: Fast-path for endpoints with no parameters.
         """
+        import re
         sig = inspect.signature(endpoint)
 
         # Import parameter types
         from vayuapi.core.params import Param, ParamType
         from vayuapi.core.dependencies import Depends, Security, DependencyCache, solve_dependencies
+
+        # Detect path parameter names from the URL template, e.g. /users/{user_id}
+        path_param_names = set(re.findall(r"\{(\w+)\}", path))
 
         # Analyze parameters
         param_info = {}
@@ -521,6 +525,15 @@ class VayuAPI:
                     "type": "dependency",
                     "dependency": param.default,
                 }
+            # Callable instance used directly as a dependency (e.g. jwt_bearer without Depends())
+            elif (param.default is not inspect.Parameter.empty
+                  and callable(param.default)
+                  and not isinstance(param.default, type)
+                  and hasattr(param.default, "__call__")):
+                param_info[param_name] = {
+                    "type": "dependency",
+                    "dependency": Depends(param.default),
+                }
             # Check for Pydantic models (body)
             elif (param.annotation != inspect.Parameter.empty and
                   isinstance(param.annotation, type) and
@@ -531,12 +544,21 @@ class VayuAPI:
                     "model": param.annotation,
                 }
             else:
-                # Default to query parameter
-                param_info[param_name] = {
-                    "type": "query",
-                    "annotation": param.annotation,
-                    "default": param.default if param.default != inspect.Parameter.empty else None,
-                }
+                annotation = param.annotation if param.annotation != inspect.Parameter.empty else None
+                default = param.default if param.default != inspect.Parameter.empty else None
+                # Detect path vs query param from the route template
+                if param_name in path_param_names:
+                    param_info[param_name] = {
+                        "type": "path_param",
+                        "annotation": annotation,
+                        "default": default,
+                    }
+                else:
+                    param_info[param_name] = {
+                        "type": "query",
+                        "annotation": annotation,
+                        "default": default,
+                    }
   #-----------------------------------------------------------------------------------------------------------------#
         # OPTIMIZATION: Fast-path for simple endpoints with no parameters
         is_simple_endpoint = len(param_info) == 0
@@ -691,11 +713,30 @@ class VayuAPI:
                             dependency_cache
                         )
                         if info["dependency"].dependency:
-                            # Call the dependency
-                            if asyncio.iscoroutinefunction(info["dependency"].dependency):
-                                kwargs[param_name] = await info["dependency"].dependency(**dep_values)
+                            # Call the dependency — detect async via the callable
+                            # itself OR via its __call__ method (handles class instances
+                            # with async def __call__, e.g. JWTBearer).
+                            dep_fn = info["dependency"].dependency
+                            is_async = (
+                                asyncio.iscoroutinefunction(dep_fn)
+                                or asyncio.iscoroutinefunction(getattr(dep_fn, "__call__", None))
+                            )
+                            if is_async:
+                                dep_result = await dep_fn(**dep_values)
                             else:
-                                kwargs[param_name] = info["dependency"].dependency(**dep_values)
+                                dep_result = dep_fn(**dep_values)
+                            # Await if result is still a coroutine (safety net)
+                            if asyncio.iscoroutine(dep_result):
+                                dep_result = await dep_result
+
+                            # Drive generator / async-generator dependencies (yield-based cleanup)
+                            import inspect as _inspect
+                            if _inspect.isasyncgen(dep_result):
+                                dep_result = await dep_result.__anext__()
+                            elif _inspect.isgenerator(dep_result):
+                                dep_result = next(dep_result)
+
+                            kwargs[param_name] = dep_result
                         else:
                             kwargs[param_name] = dep_values
 
@@ -708,11 +749,35 @@ class VayuAPI:
                             from vayuapi.core.exceptions import RequestValidationError
                             raise RequestValidationError(f"Invalid request body: {str(e)}")
 
+                    elif info["type"] == "path_param":
+                        # Extract from URL path parameters and type-coerce
+                        raw = request.path_params.get(param_name)
+                        if raw is None:
+                            raw = info["default"]
+                        if raw is not None and info["annotation"] is not None:
+                            ann = info["annotation"]
+                            if ann in (int, float, bool):
+                                try:
+                                    raw = ann(raw)
+                                except (ValueError, TypeError):
+                                    from vayuapi.core.exceptions import RequestValidationError
+                                    raise RequestValidationError(
+                                        f"Path parameter '{param_name}' must be {ann.__name__}, got {raw!r}"
+                                    )
+                        kwargs[param_name] = raw
+
                     elif info["type"] == "query":
-                        # Default query parameter handling
+                        # Default query parameter handling with type coercion
                         value = request.query_params.get(param_name)
                         if value is None:
                             value = info["default"]
+                        if value is not None and info.get("annotation") is not None:
+                            ann = info["annotation"]
+                            if ann in (int, float, bool):
+                                try:
+                                    value = ann(value)
+                                except (ValueError, TypeError):
+                                    pass  # leave as-is; let the endpoint handle it
                         kwargs[param_name] = value
 
                 # Call endpoint
@@ -807,11 +872,36 @@ class VayuAPI:
             starlette_routes.append(Route(self.docs_path, swagger_ui, methods=["GET"]))
             starlette_routes.append(Route(self.redoc_path, redoc_ui, methods=["GET"]))
 
+        # Wrap custom VayuAPI middleware stack as a Starlette BaseHTTPMiddleware
+        # so it participates in the normal Starlette middleware chain.
+        if self.middleware_stack.middleware:
+            from starlette.middleware.base import BaseHTTPMiddleware
+            from vayuapi.core.exceptions import HTTPException as VayuHTTPException
+            from starlette.exceptions import HTTPException as StarletteHTTPException
+
+            mw_stack = self.middleware_stack  # capture reference
+            exc_handler = self.exception_handler  # capture reference
+
+            class _VayuMiddlewareWrapper(BaseHTTPMiddleware):
+                async def dispatch(self, request, call_next):
+                    try:
+                        return await mw_stack.process(request, call_next)
+                    except (VayuHTTPException, StarletteHTTPException) as e:
+                        return await exc_handler.handle(request, e)
+                    except Exception as e:
+                        return await exc_handler.handle(request, e)
+
+            starlette_middleware = [
+                StarletteMiddleware(_VayuMiddlewareWrapper),
+            ] + list(self._starlette_middleware)
+        else:
+            starlette_middleware = list(self._starlette_middleware)
+
         # Create Starlette app
         app = Starlette(
             debug=self.debug,
             routes=starlette_routes,
-            middleware=self._starlette_middleware,
+            middleware=starlette_middleware,
             lifespan=self._create_lifespan(),
         )
 

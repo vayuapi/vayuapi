@@ -166,6 +166,29 @@ class AdminPanel:
         self.admin_username = admin_username
         self.admin_password = admin_password
 
+        # Auto-register with the VayuAPI app so routes are mounted automatically
+        # when AdminPanel is created externally (not via app constructor).
+        if hasattr(app, '_routes'):
+            app.admin_panel = self
+            # Ensure SessionMiddleware is available (required for request.session)
+            try:
+                from starlette.middleware.sessions import SessionMiddleware
+                from starlette.middleware import Middleware as StarletteMiddleware
+                import secrets as _secrets
+                sk = secret_key or _secrets.token_urlsafe(32)
+                # Only add if not already present
+                already = any(
+                    getattr(m, 'cls', None) is SessionMiddleware
+                    for m in getattr(app, '_starlette_middleware', [])
+                )
+                if not already:
+                    app._starlette_middleware.insert(
+                        0,
+                        StarletteMiddleware(SessionMiddleware, secret_key=sk)
+                    )
+            except Exception:
+                pass
+
     def _get_form_fields(self, model) -> str:
         """Generate HTML form fields from model."""
         form_html = ""
@@ -842,18 +865,18 @@ class AdminPanel:
             user = await get_user()
             if user and user.is_superuser and user.is_active:
                 return True
+            return False
         except ImportError:
-            # Django not available, allow access if session exists
+            # Django not available — session-only authentication:
+            # user_id in session means the admin login form was passed.
             return True
-
-        return False
 
     async def _require_auth(self, request: Request):
         """Require authentication, redirect to login if not authenticated."""
         is_authenticated = await self._check_auth(request)
         if not is_authenticated:
-            # Redirect to login page
-            return RedirectResponse(url=f"{self.path}/login?next={request.url.path}", status_code=302)
+            # Redirect to login page — use 307 Temporary Redirect to preserve method
+            return RedirectResponse(url=f"{self.path}/login?next={request.url.path}", status_code=307)
         return None
 
     def _get_nav_header(self, request: Request, breadcrumb_items: list = None) -> str:
