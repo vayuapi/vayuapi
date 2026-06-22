@@ -5,7 +5,19 @@ Dependency injection system for VayuAPI
 
 from __future__ import annotations
 
-from typing import Any, Callable, Optional, Sequence, Type, TypeVar, overload
+from typing import (
+    Any,
+    AsyncGenerator,
+    Callable,
+    Generator,
+    Iterator,
+    AsyncIterator,
+    Optional,
+    Sequence,
+    Type,
+    TypeVar,
+    overload,
+)
 import inspect
 
 T = TypeVar("T")
@@ -93,9 +105,15 @@ class Depends:
 # ---------------------------------------------------------------------------
 
 @overload
-def depends(dependency: Callable[..., T], *, use_cache: bool = ...) -> T: ...
+def depends(dependency: Callable[..., AsyncGenerator[T, None]], *, use_cache: bool = ...) -> T: ...
 @overload
-def depends(dependency: Callable[..., T], *, use_cache: bool = ...) -> T: ...  # generator / async gen variant
+def depends(dependency: Callable[..., AsyncIterator[T]], *, use_cache: bool = ...) -> T: ...
+@overload
+def depends(dependency: Callable[..., Generator[T, None, None]], *, use_cache: bool = ...) -> T: ...
+@overload
+def depends(dependency: Callable[..., Iterator[T]], *, use_cache: bool = ...) -> T: ...
+@overload
+def depends(dependency: Callable[..., T], *, use_cache: bool = ...) -> T: ...
 
 
 def depends(dependency: Callable[..., Any], *, use_cache: bool = True) -> Any:  # type: ignore[misc]
