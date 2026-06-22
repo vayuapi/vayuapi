@@ -3,8 +3,12 @@ Dependency injection system for VayuAPI
 
 """
 
-from typing import Any, Callable, Optional, Sequence
+from __future__ import annotations
+
+from typing import Any, Callable, Optional, Sequence, Type, TypeVar, overload
 import inspect
+
+T = TypeVar("T")
 
 
 class Depends:
@@ -65,9 +69,61 @@ class Depends:
         self.dependency = dependency
         self.use_cache = use_cache
 
+    # Allow `Depends[Session]` as a valid type annotation so type checkers
+    # understand the resolved type without raising "unresolved attribute".
+    def __class_getitem__(cls, item):
+        return cls
+
     def __repr__(self):
         dep = self.dependency.__name__ if self.dependency else "None"
         return f"Depends({dep})"
+
+
+# ---------------------------------------------------------------------------
+# Type-safe factory — use instead of bare Depends() when you want the IDE /
+# type checker to infer the resolved type from the dependency's return annotation.
+#
+#   from vayuapi.core.dependencies import depends
+#
+#   def get_db() -> Session: ...
+#
+#   @app.get("/users")
+#   async def list_users(db: Session = depends(get_db)):
+#       db.query(...)   # ← no "unresolved attribute" warning
+# ---------------------------------------------------------------------------
+
+@overload
+def depends(dependency: Callable[..., T], *, use_cache: bool = ...) -> T: ...
+@overload
+def depends(dependency: Callable[..., T], *, use_cache: bool = ...) -> T: ...  # generator / async gen variant
+
+
+def depends(dependency: Callable[..., Any], *, use_cache: bool = True) -> Any:  # type: ignore[misc]
+    """
+    Type-aware wrapper around ``Depends``.
+
+    Identical at runtime to ``Depends(dependency, use_cache=use_cache)`` but
+    the return annotation lets Pylance / mypy infer the resolved type from
+    the dependency callable's own return annotation, eliminating
+    "unresolved attribute reference" errors.
+
+    Example::
+
+        from sqlalchemy.orm import Session
+        from vayuapi.core.dependencies import depends
+
+        def get_db() -> Session:
+            db = SessionLocal()
+            try:
+                yield db
+            finally:
+                db.close()
+
+        @app.get("/users")
+        async def list_users(db: Session = depends(get_db)):
+            return db.query(User).all()   # ← no IDE warning
+    """
+    return Depends(dependency, use_cache=use_cache)  # type: ignore[return-value]
 
 
 class Security:

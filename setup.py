@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="vayuapi",
-    version="0.1.4",
+    version="0.1.5",
     author="VayuAPI Team",
     author_email="codeswithalok@gmail.com",
     description="The fastest Python async API framework for rapid development with AI/ML support",
@@ -159,6 +159,6 @@ setup(
     keywords=[
         "api", "async", "asyncio", "framework", "fastapi", "starlette",
         "django", "orm", "rest", "restful", "websocket", "microservices",
-        "ai", "ml", "langchain", "rag", "pydantic", "admin", "security"
+        "ai", "ml", "langchain", "rag", "pydantic","pydanticAI","admin", "security"
     ],
 )

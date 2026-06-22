@@ -27,7 +27,7 @@ from vayuapi.core.params import (
 )
 
 # Dependency injection (basic Depends/Security)
-from vayuapi.core.dependencies import Depends, Security
+from vayuapi.core.dependencies import Depends, Security, depends
 
 # IoC / DI Container
 from vayuapi.di import (
@@ -122,6 +122,7 @@ __all__ = [
     # Dependency injection (basic)
     "Depends",
     "Security",
+    "depends",
     # IoC DI Container
     "DIContainer",
     "ServiceLifetime",

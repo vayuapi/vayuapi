@@ -6,8 +6,9 @@ Compatible with FastAPI-style dependencies.
 """
 
 from typing import Optional, Dict, Any, List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import secrets
+import time as _time
 from starlette.requests import Request
 from vayuapi.core.exceptions import HTTPException
 
@@ -83,13 +84,15 @@ class JWTHandler:
         to_encode = data.copy()
 
         if expires_delta:
-            expire = datetime.utcnow() + expires_delta
+            expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.utcnow() + timedelta(minutes=self.access_token_expire_minutes)
+            expire = datetime.now(timezone.utc) + timedelta(minutes=self.access_token_expire_minutes)
 
         to_encode.update({
             "exp": expire,
-            "iat": datetime.utcnow(),
+            # Use float unix timestamp for sub-second uniqueness so two tokens
+            # created within the same calendar second still differ.
+            "iat": _time.time(),
             "type": "access"
         })
 
@@ -122,13 +125,13 @@ class JWTHandler:
         to_encode = data.copy()
 
         if expires_delta:
-            expire = datetime.utcnow() + expires_delta
+            expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.utcnow() + timedelta(days=self.refresh_token_expire_days)
+            expire = datetime.now(timezone.utc) + timedelta(days=self.refresh_token_expire_days)
 
         to_encode.update({
             "exp": expire,
-            "iat": datetime.utcnow(),
+            "iat": _time.time(),
             "type": "refresh"
         })
 
