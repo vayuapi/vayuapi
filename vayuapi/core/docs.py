@@ -9,8 +9,30 @@ from starlette.routing import Route
 from pydantic import BaseModel
 import inspect
 
-
 # Note: JSONResponse is imported from application module where needed
+
+# Parameter kinds that should be excluded from the OpenAPI schema
+# (they are resolved at runtime and are not user-visible request params)
+_HIDDEN_PARAM_ANNOTATIONS = None  # resolved lazily to avoid circular import
+
+
+def _is_dependency_param(param: inspect.Parameter) -> bool:
+    """Return True if this parameter is a Depends/Security injection — not a real request param."""
+    global _HIDDEN_PARAM_ANNOTATIONS
+    if _HIDDEN_PARAM_ANNOTATIONS is None:
+        try:
+            from vayuapi.core.dependencies import Depends, Security
+            _HIDDEN_PARAM_ANNOTATIONS = (Depends, Security)
+        except Exception:
+            _HIDDEN_PARAM_ANNOTATIONS = ()
+    # Check the default value
+    if _HIDDEN_PARAM_ANNOTATIONS and isinstance(param.default, _HIDDEN_PARAM_ANNOTATIONS):
+        return True
+    # Check callable default (e.g. JWTBearer() used without explicit Depends)
+    if param.default is not inspect.Parameter.empty and callable(param.default):
+        if not isinstance(param.default, type):
+            return True
+    return False
 
 
 class OpenAPIGenerator:
@@ -21,11 +43,21 @@ class OpenAPIGenerator:
     def __init__(self, app):
         self.app = app
         self.openapi_schema = None
+        # Components accumulator — built during schema generation
+        self._components_schemas: Dict[str, Any] = {}
+
+    def invalidate(self):
+        """Discard the cached schema so the next request regenerates it."""
+        self.openapi_schema = None
+        self._components_schemas = {}
 
     def generate_schema(self) -> Dict[str, Any]:
         """Generate OpenAPI schema."""
         if self.openapi_schema:
             return self.openapi_schema
+
+        # Reset component accumulator for this generation pass
+        self._components_schemas = {}
 
         schema = {
             "openapi": "3.0.3",
@@ -66,6 +98,10 @@ class OpenAPIGenerator:
             # Check function parameters for Pydantic models
             for param_name, param in func_signature.parameters.items():
                 if param_name in ["request", "websocket"]:
+                    continue
+
+                # Skip dependency-injected parameters — they are not request params
+                if _is_dependency_param(param):
                     continue
 
                 # Check if parameter is a Pydantic model (for request body)
@@ -135,6 +171,8 @@ class OpenAPIGenerator:
 
                 schema["paths"][path][method_lower] = operation
 
+        # Merge accumulated component schemas back into the output
+        schema["components"]["schemas"].update(self._components_schemas)
         self.openapi_schema = schema
         return schema
 
@@ -142,21 +180,21 @@ class OpenAPIGenerator:
         """Convert Pydantic model to OpenAPI schema."""
         try:
             # Use Pydantic's built-in schema generation (Pydantic v2)
-            schema = model.model_json_schema()
+            model_schema = model.model_json_schema()
 
-            # Remove the title and add to components if it has definitions
-            if '$defs' in schema:
-                # Move definitions to components/schemas
-                for def_name, def_schema in schema['$defs'].items():
-                    if def_name not in self.openapi_schema['components']['schemas']:
-                        self.openapi_schema['components']['schemas'][def_name] = def_schema
-                del schema['$defs']
+            # Move $defs into the components accumulator (self.openapi_schema may
+            # still be None at this point during generate_schema(), so we buffer
+            # definitions in _components_schemas and merge at the end).
+            if '$defs' in model_schema:
+                for def_name, def_schema in model_schema['$defs'].items():
+                    self._components_schemas.setdefault(def_name, def_schema)
+                del model_schema['$defs']
 
-            return schema
+            return model_schema
         except AttributeError:
-            # Fallback for Pydantic v1 or if model_json_schema doesn't exist
+            # Fallback for Pydantic v1
             try:
-                return model.schema()
+                return model.schema()  # type: ignore[attr-defined]
             except Exception:
                 return {"type": "object"}
         except Exception:
