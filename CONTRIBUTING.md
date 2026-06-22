@@ -217,7 +217,7 @@ When adding features:
 ## Questions?
 
 - 💬 [Discord](https://discord.gg/vayuapi)
-- 📧 Email: dev@vayuapi.dev
+- 📧 Email: codeswithalok@gmail.com
 - 🐛 [GitHub Issues](https://github.com/vayuapi/vayuapi/issues)
 
 ## License
