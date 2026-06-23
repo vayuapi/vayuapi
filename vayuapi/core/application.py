@@ -472,6 +472,9 @@ class VayuAPI:
             "methods": methods,
             "name": name or endpoint.__name__,
         })
+        # Invalidate cached OpenAPI schema so new routes appear in /docs
+        if self.openapi_generator:
+            self.openapi_generator.invalidate()
 
     def _add_websocket_route(self, path: str, endpoint: Callable, **kwargs):
         """Internal method to add WebSocket route."""
@@ -847,10 +850,16 @@ class VayuAPI:
         if self.docs_enabled and self.openapi_generator:
             from starlette.responses import HTMLResponse
 
-            # OpenAPI JSON schema
-            def openapi_schema(request: Request):
-                schema = self.openapi_generator.generate_schema()
-                return JSONResponse(schema)
+            # OpenAPI JSON schema — async so Starlette runs it on the event loop
+            async def openapi_schema(request: Request):
+                try:
+                    schema = self.openapi_generator.generate_schema()
+                    return JSONResponse(schema)
+                except Exception as exc:
+                    return JSONResponse(
+                        {"detail": f"Failed to generate OpenAPI schema: {exc}"},
+                        status_code=500,
+                    )
 
             # Swagger UI
             def swagger_ui(request: Request):
