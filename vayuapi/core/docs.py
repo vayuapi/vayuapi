@@ -229,7 +229,7 @@ def get_swagger_ui_html(openapi_url: str, title: str) -> str:
     <head>
         <title>{title} - Swagger UI</title>
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
-        <link rel="icon" type="image/ico" href="http://vayuapi.amrits.in/ingue/2.ico">
+        <link rel="icon" type="image/ico" href="https://vayuapi.amrits.in/static/assets/logo/hd_logo.webp">
         <style>
             html {{ box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }}
             *, *:before, *:after {{ box-sizing: inherit; }}
@@ -270,7 +270,7 @@ def get_redoc_html(openapi_url: str, title: str) -> str:
         <title>{title} - ReDoc</title>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" type="image/png" href="https://fastapi.tiangolo.com/img/favicon.png">
+        <link rel="icon" type="image/png" href="https://vayuapi.amrits.in/static/assets/logo/hd_logo.webp">
         <style>
             body {{ margin: 0; padding: 0; }}
         </style>
